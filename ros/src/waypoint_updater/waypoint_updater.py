@@ -43,6 +43,10 @@ class WaypointUpdater(object):
 
     def pose_cb(self, msg):
         # TODO: Implement
+        # added 7/1/2018
+        # get pose of the car
+        self.pose = msg
+
         pass
 
     def waypoints_cb(self, waypoints):
