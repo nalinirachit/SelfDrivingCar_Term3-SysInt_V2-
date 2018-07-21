@@ -5,6 +5,13 @@ from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 
 import math
+import rospy
+from styx_msgs.msg import Lane, Waypoint
+from geometry_msgs.msg import PoseStamped
+from std_msgs.msg import Int32
+
+
+
 
 '''
 This node will publish waypoints from the car's current position to some `x` distance ahead.
@@ -19,7 +26,7 @@ current status in `/vehicle/traffic_lights` message. You can use this message to
 as well as to verify your TL classifier.
 
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
-Nalini 7/18/2018
+Nalini 7/21/2018
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
@@ -39,6 +46,8 @@ class WaypointUpdater(object):
 
         # TODO: Add other member variables you need below
 
+        self.waypoints = None
+
         rospy.spin()
 
     def pose_cb(self, msg):
@@ -49,8 +58,9 @@ class WaypointUpdater(object):
 
         pass
 
-    def waypoints_cb(self, waypoints):
+    def waypoints_cb(self, msg):
         # TODO: Implement
+        
         if self.waypoints is None:
         	self.waypoints = msg.waypoints
 
