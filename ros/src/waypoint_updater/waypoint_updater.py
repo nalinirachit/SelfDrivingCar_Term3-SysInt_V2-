@@ -5,9 +5,6 @@ from geometry_msgs.msg import PoseStamped
 from styx_msgs.msg import Lane, Waypoint
 
 import math
-import rospy
-from styx_msgs.msg import Lane, Waypoint
-from geometry_msgs.msg import PoseStamped
 from std_msgs.msg import Int32
 
 
@@ -26,7 +23,7 @@ current status in `/vehicle/traffic_lights` message. You can use this message to
 as well as to verify your TL classifier.
 
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
-Nalini 7/25/2018
+Nalini 7/29/2018
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
@@ -34,10 +31,16 @@ LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this n
 
 class WaypointUpdater(object):
     def __init__(self):
+
+    	print ('0. in waypoint updater')
         rospy.init_node('waypoint_updater')
+        rospy.loginfo('in waypoint updater')
 
         rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size = 1)
+        print ("1. After current_pose")
+
         rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size = 1)
+        print ("3. After base_waypoints")
 
         # TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
         rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb, queue_size = 1)
@@ -56,14 +59,16 @@ class WaypointUpdater(object):
         # added 7/1/2018
         # get pose of the car
         self.pose = msg
+        print ("2. After pose_cb")
 
-        pass
+        
 
     def waypoints_cb(self, msg):
         # TODO: Implement
         
         if self.waypoints is None:
         	self.waypoints = msg.waypoints
+        print ("4. After waypoints_cb")
 
 
     def traffic_cb(self, msg):
@@ -92,6 +97,7 @@ class WaypointUpdater(object):
 
 if __name__ == '__main__':
     try:
+    	print ("00. in waypoint updater")
         WaypointUpdater()
     except rospy.ROSInterruptException:
         rospy.logerr('Could not start waypoint updater node.')
