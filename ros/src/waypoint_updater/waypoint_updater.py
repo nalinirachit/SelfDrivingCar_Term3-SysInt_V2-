@@ -23,7 +23,7 @@ current status in `/vehicle/traffic_lights` message. You can use this message to
 as well as to verify your TL classifier.
 
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
-Nalini 8/4/2018
+Nalini 8/5/2018
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
@@ -49,6 +49,7 @@ class WaypointUpdater(object):
 
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
+
         # TODO: Add other member variables you need below
 
         self.waypoints = None
@@ -60,7 +61,11 @@ class WaypointUpdater(object):
         # added 7/1/2018
         # get pose of the car
         self.current_pose = msg.pose
+        if self.waypoints is not None:
+        	self.create_final_waypoints()
+
         # rospy.loginfo('4. After pose_cb')
+        # rospy.loginfo(self.current_pose)
 
         
 
@@ -69,8 +74,9 @@ class WaypointUpdater(object):
         
         if self.waypoints is None:
         	self.waypoints = msg.waypoints
-        
-        rospy.loginfo('3. After waypoints_cb')
+        	
+        # rospy.loginfo('3. After waypoints_cb')
+        # rospy.loginfo(self.waypoints)
 
 
     def traffic_cb(self, msg):
@@ -113,11 +119,16 @@ class WaypointUpdater(object):
 
 
 	def create_final_waypoints(self):
-		idx_of_nearest_wp = self.get_closest_waypoint (self.current_pose)
-		next_waypoints = copy.deepcopy(self.waypoints[idx_of_nearest_wp:idx_of_nearest_wp+LOOKAHEAD_WPS])
-		lane = Lane()
-		lane.waypoints = next_waypoints
-		self.final_waypoints_pub.publish(lane)
+
+		if self.current_pose is not none:
+			idx_of_nearest_wp = self.get_closest_waypoint (self.current_pose)
+			next_waypoints = copy.deepcopy(self.waypoints[idx_of_nearest_wp:idx_of_nearest_wp+LOOKAHEAD_WPS])
+			lane = Lane()
+			lane.header = self.base_waypoints.header
+			lane.waypoints = next_waypoints
+			self.final_waypoints_pub.publish(lane)
+			rospy.loginfo('Getting final waypoints')
+
 
 
 if __name__ == '__main__':
