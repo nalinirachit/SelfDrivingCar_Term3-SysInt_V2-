@@ -6,6 +6,7 @@ from styx_msgs.msg import Lane, Waypoint
 
 import math
 from std_msgs.msg import Int32
+import copy
 
 
 
@@ -23,7 +24,7 @@ current status in `/vehicle/traffic_lights` message. You can use this message to
 as well as to verify your TL classifier.
 
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
-Nalini 8/8/2018
+Nalini 8/10/2018
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
@@ -65,6 +66,7 @@ class WaypointUpdater(object):
 		if self.current_pose is not None:
 			idx_of_nearest_wp = self.get_closest_waypoint (self.current_pose)
 			next_waypoints = copy.deepcopy(self.waypoints[idx_of_nearest_wp:idx_of_nearest_wp+LOOKAHEAD_WPS])
+
 			lane = Lane()
 			lane.header = self.base_waypoints.header
 			lane.waypoints = next_waypoints
@@ -114,7 +116,8 @@ class WaypointUpdater(object):
 
 		closest_len = 100000
 		closest_waypoint = 0
-		dl = lambda a, b: math.sqrt((a.x-b.x)**2 - (a.y-b.y)**2)
+		dl = lambda a, b: math.sqrt((a.x-b.x)**2 + (a.y-b.y)**2)
+		
 		for index, waypoint in enumerate(self.waypoints):
 			dist = dl(pose.position, waypoint.pose.pose.position)
 			if (dist < closest_len):
