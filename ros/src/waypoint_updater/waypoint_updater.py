@@ -38,11 +38,11 @@ class WaypointUpdater(object):
 		# rospy.loginfo('in waypoint updater')
 
 		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size = 1)
-		rospy.loginfo('1. After current_pose')
+		# rospy.loginfo('1. After current_pose')
 
 		rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb, queue_size = 1)
 		
-		rospy.loginfo('2. After base_waypoints')
+		# rospy.loginfo('2. After base_waypoints')
 
 		# TODO: Add a subscriber for /traffic_waypoint and /obstacle_waypoint below
 		rospy.Subscriber('/traffic_waypoint', Int32, self.traffic_cb, queue_size = 1)
@@ -58,20 +58,6 @@ class WaypointUpdater(object):
 
 		rospy.spin()
 
-
-
-
-	def create_final_waypoints(self):
-		rospy.loginfo('in create final waypoints')
-		if self.current_pose is not None:
-			idx_of_nearest_wp = self.get_closest_waypoint (self.current_pose)
-			next_waypoints = copy.deepcopy(self.waypoints[idx_of_nearest_wp:idx_of_nearest_wp+LOOKAHEAD_WPS])
-
-			lane = Lane()
-			lane.header = self.base_waypoints.header
-			lane.waypoints = next_waypoints
-			self.final_waypoints_pub.publish(lane)
-			rospy.loginfo('Getting final waypoints')
 
 	def pose_cb(self, msg):
 		# TODO: Implement
@@ -126,7 +112,19 @@ class WaypointUpdater(object):
 
 		return closest_waypoint     
 
-
+	def create_final_waypoints(self):
+		rospy.loginfo('in create final waypoints')
+		if self.current_pose is not None:
+			idx_of_nearest_wp = self.get_closest_waypoint (self.current_pose)
+			rospy.loginfo('nearest waypoint:')
+			rospy.loginfo(idx_of_nearest_wp)
+			next_waypoints = copy.deepcopy(self.waypoints[idx_of_nearest_wp:idx_of_nearest_wp+LOOKAHEAD_WPS])
+			lane = Lane()
+			lane.header.frame_id = '/world'
+			lane.waypoints = next_waypoints
+			# rospy.loginfo(next_waypoints)
+			self.final_waypoints_pub.publish(lane)
+			# rospy.loginfo('Getting final waypoints')
 
 	def distance(self, waypoints, wp1, wp2):
 		dist = 0
