@@ -29,7 +29,7 @@ You are free to use them or build your own.
 Once you have the proposed throttle, brake, and steer values, publish it on the various publishers
 that we have created in the `__init__` function.
 
-Nalini DBW starting code 8/12/2018
+Nalini DBW starting code 8/18/2018
 
 '''
 
@@ -63,6 +63,11 @@ class DBWNode(object):
 		rospy.subscriber('/twist_cmd', TwistStamped, self.twist_cb)
 		rospy.subscriber('/vehicle/dbw_enabled', Bool, self.dbw_enabled_cb)
 
+		self.current_vel = None
+		self.linear_vel = None
+		self.angular_vel = None
+
+
 		self.loop()
 
 	def loop(self):
@@ -81,7 +86,14 @@ class DBWNode(object):
 
 
 	def velocity_cb(self, msg):
-		self.current_velocity = msg.twist.linear.x
+		self.current_vel = msg.twist.linear.x
+
+	def twist_cb(self, msg):
+		self.linear_vel = msg.twist.linear.x
+		self.angular_vel = msg.twist.angular.z
+
+	def dbw_enabled_cb(self, msg):
+		self.dbw.enabled = msg
 
 
 	def publish(self, throttle, brake, steer):
