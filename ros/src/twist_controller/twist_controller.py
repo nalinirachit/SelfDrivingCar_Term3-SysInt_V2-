@@ -37,9 +37,10 @@ class Controller(object):
 
 		self.vehicle_mass = kwargs['vehicle_mass'] + kwargs['fuel_capacity'] * GAS_DENSITY
 		self.brake_deadband = kwargs['brake_deadband']
+		#***HERE
 
 
-
+		self.last_time = rospy.get_time()
 		
 
 	def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
@@ -51,6 +52,18 @@ class Controller(object):
 
 
 		current_vel = self.vel_lpf.filt(current_vel)
+
+		steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
+
+		vel_error = linear_vel - current_vel
+		self.last_vel = current_vel
+
+		current_time = rospy.get_time()
+		sample_time = current_time - self.last_time
+		#**HERE
+
+
+
 
 
 		return 1., 0., 0.
