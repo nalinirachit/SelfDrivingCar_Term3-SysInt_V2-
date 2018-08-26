@@ -15,6 +15,7 @@ class Controller(object):
 		# TODO: Implement
 		self.wheel_base = kwargs['wheel_base']
 		self.steer_ratio = kwargs['steer_ratio']
+		self.fuel_capacity = kwargs['fuel_capacity']
 		self.min_speed = 0
 		self.max_lat_accel = kwargs['max_lat_accel']
 		self.max_steer_angle = kwargs['max_steer_angle']
@@ -37,8 +38,7 @@ class Controller(object):
 
 		self.vehicle_mass = kwargs['vehicle_mass'] + kwargs['fuel_capacity'] * GAS_DENSITY
 		self.brake_deadband = kwargs['brake_deadband']
-		#***HERE
-
+		
 
 		self.last_time = rospy.get_time()
 		
@@ -60,10 +60,24 @@ class Controller(object):
 
 		current_time = rospy.get_time()
 		sample_time = current_time - self.last_time
-		#**HERE
+		self.last_time = current_time
+
+		throttle = self.pid_controller.step(vel_error, sample_time)
+		brake = 0
+
+		If linear_vel == 0 and current_vel < 0.1:
+			throttle = 0
+			break = 400 # car stops at light
+
+		elif throttle < .1 and vel_error < 0:
+			throttle = 0
+			decel = max(vel_error, self.decel_limit)
+			brake = abs(decel)*self.vehicle_mass*self.wheel_radius
 
 
 
 
 
-		return 1., 0., 0.
+
+
+		return throttle, brake, steering
