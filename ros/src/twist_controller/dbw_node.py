@@ -29,7 +29,7 @@ You are free to use them or build your own.
 Once you have the proposed throttle, brake, and steer values, publish it on the various publishers
 that we have created in the `__init__` function.
 
-Nalini DBW starting code 8/18/2018
+Nalini DBW 9/2/2018
 
 '''
 
@@ -92,10 +92,22 @@ class DBWNode(object):
 
 			if not None in (self.current_vel, self.linear_vel, self.angular_vel):
 
+				# rospy.loginfo('DBW Enabled: %s', self.dbw_enabled)
+
 				self.throttle, self.brake, self.steering = self.controller.control(self.current_vel,
-				                                                     self.angular_vel,
-				                                                     self.linear_vel,
-				                                                     self.dbw_enabled)
+																	self.dbw_enabled,				                                                    
+				                                                    self.linear_vel,
+				                                                    self.angular_vel)
+
+
+				# rospy.loginfo('Target velocity: %s', self.linear_vel)
+				# rospy.loginfo('Current Velocity: %s', self.current_vel)
+				# rospy.loginfo('Velocity Delta: %s', self.linear_vel - self.current_vel)
+				# rospy.loginfo('Throttle: %s', self.throttle)
+				# rospy.loginfo('Brake: %s', self.brake)
+				# rospy.loginfo('Steering: %s', self.steering)
+
+
 				if 	self.dbw_enabled:
 				   	self.publish(self.throttle, self.brake, self.steering)
 
