@@ -1,4 +1,8 @@
+
+
 #!/usr/bin/env python
+# Nalini added 9/8/2018
+
 import rospy
 from std_msgs.msg import Int32
 from geometry_msgs.msg import PoseStamped, Pose
@@ -113,14 +117,21 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        if(not self.has_image):
-            self.prev_light_loc = None
-            return False
 
-        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        # for testing just return light stats
+        return light.state
+
+        # 9/8/2018 comment out for now
+        # if(not self.has_image):
+            # self.prev_light_loc = None
+            # return False
+
+        # 9/8/2018 comment out for now
+        # cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
 
         #Get classification
-        return self.light_classifier.get_classification(cv_image)
+        # 9/8/2018 comment out for now
+        # return self.light_classifier.get_classification(cv_image)
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
