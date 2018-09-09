@@ -1,7 +1,7 @@
 
 
 #!/usr/bin/env python
-# Nalini added 9/8/2018
+# Nalini added 9/9/2018
 
 import rospy
 from std_msgs.msg import Int32
@@ -14,6 +14,8 @@ from light_classification.tl_classifier import TLClassifier
 import tf
 import cv2
 import yaml
+import math
+
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -105,7 +107,23 @@ class TLDetector(object):
 
         """
         #TODO implement
-        return 0
+
+        closest_len = 100000
+        closest_waypint = 0
+
+        dl = lambda a, b: math.sqrt ((a.x-b.x)**2 + (a.y-b.y)**2)
+
+        for index, waypoint in enumerate self.waypiints:
+        	dist = dl(pose.position, waypoint.pose.pose.position)
+        	if dist < closest_len:
+        		closest_len = dist
+        		closest_waypoint =  index
+
+        return closest_waypoint
+
+
+
+
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
@@ -142,12 +160,17 @@ class TLDetector(object):
             int: ID of traffic light color (specified in styx_msgs/TrafficLight)
 
         """
-        light = None
+        closest_light = None
+        line_wp_idx = None
+
 
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
+
         if(self.pose):
-            car_position = self.get_closest_waypoint(self.pose.pose)
+            car_wp_idx = self.get_closest_waypoint(self.pose.pose)
+            diff = len(self.waypoints.waypoints)
+
 
         #TODO find the closest visible traffic light (if one exists)
 
