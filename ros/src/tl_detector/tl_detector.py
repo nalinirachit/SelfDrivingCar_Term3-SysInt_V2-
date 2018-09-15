@@ -1,8 +1,6 @@
 
 
 #!/usr/bin/env python
-# Nalini added 9/9/2018
-
 import rospy
 from std_msgs.msg import Int32
 from geometry_msgs.msg import PoseStamped, Pose
@@ -16,6 +14,8 @@ import cv2
 import yaml
 import math
 
+
+# Nalini 9/15/2018
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -171,13 +171,21 @@ class TLDetector(object):
             car_wp_idx = self.get_closest_waypoint(self.pose.pose)
             diff = len(self.waypoints.waypoints)
 
+            for i, light in enumerate(self.lights):
+            	line = stop_line_positions[i]
+            	temp_wp_idx = self.get_closest_waypoint(line[0], line[1])
+            	# find closest waypoint index
+            	d = temp_wp_idx - car_wp_idx
+            	if d > 0 and d < diff:
+            		diff = d
+            		closest_light = light
+            		line_wp_idx = temp_wp_idx
 
-        #TODO find the closest visible traffic light (if one exists)
-
-        if light:
-            state = self.get_light_state(light)
-            return light_wp, state
-        self.waypoints = None
+   		#TODO find the closest visible traffic light (if one exists)
+   		if closest_light:
+   			state = get_light_state(closest_light)
+   			return line_wp_idx, state       
+        
         return -1, TrafficLight.UNKNOWN
 
 if __name__ == '__main__':
