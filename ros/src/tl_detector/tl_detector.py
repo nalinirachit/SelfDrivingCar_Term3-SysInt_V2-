@@ -1,6 +1,6 @@
-
-
 #!/usr/bin/env python
+
+
 
 
 import rospy
@@ -115,7 +115,7 @@ class TLDetector(object):
 
 		dl = lambda a, b: math.sqrt ((a.x-b.x)**2 + (a.y-b.y)**2)
 
-		for index, waypoint in enumerate self.waypiints:
+		for index, waypoint in enumerate(self.waypoints):
 			dist = dl(pose.position, waypoint.pose.pose.position)
 			if dist < closest_len:
 				closest_len = dist
