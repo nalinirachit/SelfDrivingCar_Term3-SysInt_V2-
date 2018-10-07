@@ -17,7 +17,7 @@ import yaml
 import math
 
 
-# Nalini 9/15/2018
+# Nalini 10/7/2018
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -66,6 +66,7 @@ class TLDetector(object):
 		self.waypoints = waypoints
 
 	def traffic_cb(self, msg):
+		rospy.loginfo("In traffic_cb")
 		self.lights = msg.lights
 
 	def image_cb(self, msg):
@@ -78,6 +79,7 @@ class TLDetector(object):
 		"""
 		self.has_image = True
 		self.camera_image = msg
+		rospy.loginfo("In image_cb")
 		light_wp, state = self.process_traffic_lights()
 
 		'''
@@ -186,6 +188,8 @@ class TLDetector(object):
 		#TODO find the closest visible traffic light (if one exists)
 		if closest_light:
 			state = get_light_state(closest_light)
+			rospy.loginfo("tl_detector returning values")
+			rospy.loginfo(line_wp_idx, state)
 			return line_wp_idx, state       
 		
 		return -1, TrafficLight.UNKNOWN
