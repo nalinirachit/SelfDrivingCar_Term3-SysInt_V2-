@@ -17,7 +17,7 @@ import yaml
 import math
 
 
-# Nalini 10/7/2018
+# Nalini 10/14/2018
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -81,6 +81,8 @@ class TLDetector(object):
 		self.camera_image = msg
 		rospy.loginfo("In image_cb")
 		light_wp, state = self.process_traffic_lights()
+		rospy.loginfo("got light state")
+		rospy.loginfo("light_wp and state", light_wp, state)
 
 		'''
 		Publish upcoming red lights at camera frequency.
