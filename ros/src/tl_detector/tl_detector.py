@@ -17,7 +17,7 @@ import yaml
 import math
 
 
-# Nalini 10/14/2018
+# Nalini 10/20/2018, getting errors , need to fix
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -41,6 +41,7 @@ class TLDetector(object):
 		rely on the position of the light and the camera image to predict it.
 		'''
 		sub3 = rospy.Subscriber('/vehicle/traffic_lights', TrafficLightArray, self.traffic_cb)
+
 		sub6 = rospy.Subscriber('/image_color', Image, self.image_cb)
 
 		config_string = rospy.get_param("/traffic_light_config")
@@ -63,10 +64,10 @@ class TLDetector(object):
 		self.pose = msg
 
 	def waypoints_cb(self, waypoints):
-		self.waypoints = waypoints
+		self.waypoints = waypoints.waypoints
 
 	def traffic_cb(self, msg):
-		rospy.loginfo("In traffic_cb")
+		# rospy.loginfo("In traffic_cb")
 		self.lights = msg.lights
 
 	def image_cb(self, msg):
@@ -79,10 +80,10 @@ class TLDetector(object):
 		"""
 		self.has_image = True
 		self.camera_image = msg
-		rospy.loginfo("In image_cb")
+		# rospy.loginfo("In image_cb")
 		light_wp, state = self.process_traffic_lights()
-		rospy.loginfo("got light state")
-		rospy.loginfo("light_wp and state", light_wp, state)
+		# rospy.loginfo("got light state")
+		# rospy.loginfo("light_wp and state", light_wp, state)
 
 		'''
 		Publish upcoming red lights at camera frequency.
@@ -175,11 +176,13 @@ class TLDetector(object):
 
 		if(self.pose):
 			car_wp_idx = self.get_closest_waypoint(self.pose.pose)
-			diff = len(self.waypoints.waypoints)
+			diff = len(self.waypoints)
 
 			for i, light in enumerate(self.lights):
 				line = stop_line_positions[i]
-				temp_wp_idx = self.get_closest_waypoint(line[0], line[1])
+				rospy.loginfo("line values:")
+				rospy.loginfo(line)
+				temp_wp_idx = self.get_closest_waypoint(line)
 				# find closest waypoint index
 				d = temp_wp_idx - car_wp_idx
 				if d > 0 and d < diff:
@@ -190,8 +193,8 @@ class TLDetector(object):
 		#TODO find the closest visible traffic light (if one exists)
 		if closest_light:
 			state = get_light_state(closest_light)
-			rospy.loginfo("tl_detector returning values")
-			rospy.loginfo(line_wp_idx, state)
+			# rospy.loginfo("tl_detector returning values")
+			# rospy.loginfo(line_wp_idx, state)
 			return line_wp_idx, state       
 		
 		return -1, TrafficLight.UNKNOWN
