@@ -103,7 +103,7 @@ class TLDetector(object):
 			self.upcoming_red_light_pub.publish(Int32(self.last_wp))
 		self.state_count += 1
 
-	def get_closest_waypoint(self, pose):
+	def get_closest_waypoint(self, x, y):
 		"""Identifies the closest path waypoint to the given position
 			https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
 		Args:
@@ -118,10 +118,11 @@ class TLDetector(object):
 		closest_len = 100000
 		closest_waypint = 0
 
-		dl = lambda a, b: math.sqrt ((a.x-b.x)**2 + (a.y-b.y)**2)
+		dl = lambda x, y , a, b: math.sqrt ((a.x-b.x)**2 + (a.y-b.y)**2)
+
 
 		for index, waypoint in enumerate(self.waypoints):
-			dist = dl(pose.position, waypoint.pose.pose.position)
+			dist = dl(x, y, waypoint.pose.pose.position.x, waypoint.pose.pose.position.x)
 			if dist < closest_len:
 				closest_len = dist
 				closest_waypoint =  index
@@ -175,14 +176,14 @@ class TLDetector(object):
 		stop_line_positions = self.config['stop_line_positions']
 
 		if(self.pose):
-			car_wp_idx = self.get_closest_waypoint(self.pose.pose)
+			car_wp_idx = self.get_closest_waypoint(self.pose.pose.position.x, self.pose.pose.position.y )
 			diff = len(self.waypoints)
 
 			for i, light in enumerate(self.lights):
 				line = stop_line_positions[i]
 				rospy.loginfo("line values:")
 				rospy.loginfo(line)
-				temp_wp_idx = self.get_closest_waypoint(line)
+				temp_wp_idx = self.get_closest_waypoint(line[0], line[1])
 				# find closest waypoint index
 				d = temp_wp_idx - car_wp_idx
 				if d > 0 and d < diff:
