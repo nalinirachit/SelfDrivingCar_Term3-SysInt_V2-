@@ -17,7 +17,7 @@ import yaml
 import math
 
 
-# Nalini 10/20/2018, getting errors , need to fix
+# Nalini 10/28/2018, getting errors , need to fix
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -70,6 +70,11 @@ class TLDetector(object):
 		# rospy.loginfo("In traffic_cb")
 		self.lights = msg.lights
 
+	def distance(self, x1, y1, x2, y2):
+		dx, dy = x1-x2, y1-y2
+		dist = math.sqrt(dx*dx + dy*dy)
+		return dist
+
 	def image_cb(self, msg):
 		"""Identifies red lights in the incoming camera image and publishes the index
 			of the waypoint closest to the red light's stop line to /traffic_waypoint
@@ -115,14 +120,19 @@ class TLDetector(object):
 		"""
 		#TODO implement
 
+		# rospy.loginfo("In get Closest WP:")
+		# rospy.loginfo(x)
+		# rospy.loginfo(y)
+
 		closest_len = 100000
 		closest_waypint = 0
 
-		dl = lambda x, y , a, b: math.sqrt ((a.x-b.x)**2 + (a.y-b.y)**2)
+		# not working - creating separate function
+		# dl = lambda x, y , a, b: math.sqrt ((a.x-b.x)**2 + (a.y-b.y)**2)
 
 
 		for index, waypoint in enumerate(self.waypoints):
-			dist = dl(x, y, waypoint.pose.pose.position.x, waypoint.pose.pose.position.x)
+			dist = self.distance(x, y, waypoint.pose.pose.position.x, waypoint.pose.pose.position.x)
 			if dist < closest_len:
 				closest_len = dist
 				closest_waypoint =  index
@@ -176,6 +186,8 @@ class TLDetector(object):
 		stop_line_positions = self.config['stop_line_positions']
 
 		if(self.pose):
+			# rospy.loginfo("car position:")
+			# rospy.loginfo(self.pose)
 			car_wp_idx = self.get_closest_waypoint(self.pose.pose.position.x, self.pose.pose.position.y )
 			diff = len(self.waypoints)
 
@@ -193,9 +205,9 @@ class TLDetector(object):
 
 		#TODO find the closest visible traffic light (if one exists)
 		if closest_light:
-			state = get_light_state(closest_light)
-			# rospy.loginfo("tl_detector returning values")
-			# rospy.loginfo(line_wp_idx, state)
+			state = self.get_light_state(closest_light)
+			rospy.loginfo("tl_detector returning values:")
+			rospy.loginfo(line_wp_idx, state)
 			return line_wp_idx, state       
 		
 		return -1, TrafficLight.UNKNOWN
