@@ -25,7 +25,7 @@ current status in `/vehicle/traffic_lights` message. You can use this message to
 as well as to verify your TL classifier.
 
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
-Nalini 10/7/2018
+Nalini 11/3/2018
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
@@ -87,7 +87,8 @@ class WaypointUpdater(object):
 
 	def traffic_cb(self, msg):
 		# TODO: Callback for /traffic_waypoint message. Implement
-		rospy.loginfo("in traffic_cb wp_upd", msg.data)
+		rospy.loginfo("in traffic_cb waypoint updater:")
+		rospy.loginfo(msg.data)
 		self.red_light_wp = msg.data
 		
 

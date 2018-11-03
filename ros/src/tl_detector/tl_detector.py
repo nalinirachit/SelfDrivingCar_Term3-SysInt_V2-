@@ -17,7 +17,7 @@ import yaml
 import math
 
 
-# Nalini 10/28/2018, getting errors , need to fix
+# Nalini 11/3/2018
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -207,7 +207,8 @@ class TLDetector(object):
 		if closest_light:
 			state = self.get_light_state(closest_light)
 			rospy.loginfo("tl_detector returning values:")
-			rospy.loginfo(line_wp_idx, state)
+			rospy.loginfo(line_wp_idx)
+			rospy.loginfo(state)
 			return line_wp_idx, state       
 		
 		return -1, TrafficLight.UNKNOWN
