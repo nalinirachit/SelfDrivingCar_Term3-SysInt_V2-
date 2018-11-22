@@ -25,7 +25,7 @@ current status in `/vehicle/traffic_lights` message. You can use this message to
 as well as to verify your TL classifier.
 
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
-Nalini 11/3/2018
+Nalini 11/22/2018
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
@@ -37,6 +37,12 @@ class WaypointUpdater(object):
 		
 		rospy.init_node('waypoint_updater')
 		# rospy.loginfo('in waypoint updater')
+
+		self.base_lane = None
+		self.pose = None
+		self.stopline_wp_idx = -1
+
+
 
 		rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb, queue_size = 1)
 		# rospy.loginfo('1. After current_pose')
@@ -56,7 +62,7 @@ class WaypointUpdater(object):
 
 		self.waypoints = None
 		self.current_pose = None
-		self.red_light_wp = None
+		
 
 		rospy.spin()
 
@@ -87,9 +93,9 @@ class WaypointUpdater(object):
 
 	def traffic_cb(self, msg):
 		# TODO: Callback for /traffic_waypoint message. Implement
-		rospy.loginfo("in traffic_cb waypoint updater:")
-		rospy.loginfo(msg.data)
-		self.red_light_wp = msg.data
+		# rospy.loginfo("in traffic_cb waypoint updater:")
+		# rospy.loginfo(msg.data)
+		self.stopline_wp_idx = msg.data
 		
 
 	def obstacle_cb(self, msg):
@@ -115,6 +121,30 @@ class WaypointUpdater(object):
 				closest_waypoint = index
 
 		return closest_waypoint     
+
+
+	def publish_waypoints(self):
+		final_lane = self.generate_lane()
+		self.final_waypoints_pub.publish(final_lane)
+
+
+	def genarate_lane(self):
+		# get waypoints and update their velocities based on how we want the car to behave
+		# if stop line waypoint is too far or -1, then just publish the waypoints, else decelerate the waypoints
+		lane = Lane()
+
+		closest_idx = self.get_closest_waypoint()
+		farthest_idx = closest_idx + LOOKAHEAD_WPS
+		base_waypoints =  self.base_lane.waypoints[closest_idx:farthest_idx]
+
+		if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx);
+			lane.waypoints = base_waypoints
+		else:
+			lane_waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
+
+		return lane
+
+
 
 	def create_final_waypoints(self):
 		# rospy.loginfo('in create final waypoints')
