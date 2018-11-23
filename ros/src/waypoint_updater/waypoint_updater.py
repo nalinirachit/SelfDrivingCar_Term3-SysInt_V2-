@@ -29,6 +29,7 @@ Nalini 11/22/2018
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
+MAX_DECEL = .5
 
 
 class WaypointUpdater(object):
@@ -83,11 +84,11 @@ class WaypointUpdater(object):
 
 	def waypoints_cb(self, msg):
 		# TODO: Implement
-		
+		self.base_lane = waypoints
 		if self.waypoints is None:
 			self.waypoints = msg.waypoints
 			
-		rospy.loginfo('3. After waypoints_cb')
+		# rospy.loginfo('3. After waypoints_cb')
 		# rospy.loginfo(self.waypoints)
 
 
@@ -144,7 +145,25 @@ class WaypointUpdater(object):
 
 		return lane
 
+	def decelerate_waypoints(self, waypoints, closest_idx):
+		temp = []
+		for i, wp in enumerate(waypoints);
+			p = Waypoint()
+			p.pose = wp.pose
+			# stop two waypoints back from the line so that the car stops on time
+			# -2 is included because the waypoint is at the center of teh car to we want to go two waypoints behind
+			stop_idx = max(self.stopline_wp_idx - closest_idx - 2, 0)
+			dist = self.distance(waypoints, i, stop_idx)
+			# the larger the distance, larger the velocity
+			vel = math.sqrt(2 * MAX_DECEL * dist)
+			if vel < 1.:
+				vel = 0.
 
+			# if the calculated velocity is very large , then just get the waypoints velocity
+			p.twist.twist.linear.x = min (vel, wp.twist.twist.linear.x)
+			temp.append(p)				
+
+		return temp
 
 	def create_final_waypoints(self):
 		# rospy.loginfo('in create final waypoints')
