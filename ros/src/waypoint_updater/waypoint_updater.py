@@ -25,7 +25,7 @@ current status in `/vehicle/traffic_lights` message. You can use this message to
 as well as to verify your TL classifier.
 
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
-Nalini 11/22/2018
+Nalini 11/24/2018
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
@@ -73,20 +73,21 @@ class WaypointUpdater(object):
 		# added 7/1/2018
 		# get pose of the car
 		self.current_pose = msg.pose
-		#rospy.loginfo('4a. in Pose cb')
+		# rospy.loginfo('4a. in Pose cb')
 		if self.waypoints is not None:
 			self.create_final_waypoints()
 
-		#rospy.loginfo('4. After pose_cb')
-		#rospy.loginfo(self.current_pose)
+		# rospy.loginfo('4. After pose_cb')
+		# rospy.loginfo(self.current_pose)
 
 		
 
 	def waypoints_cb(self, msg):
 		# TODO: Implement
-		self.base_lane = waypoints
+		
 		if self.waypoints is None:
 			self.waypoints = msg.waypoints
+			self.base_lane = msg.waypoints
 			
 		# rospy.loginfo('3. After waypoints_cb')
 		# rospy.loginfo(self.waypoints)
@@ -134,20 +135,20 @@ class WaypointUpdater(object):
 		# if stop line waypoint is too far or -1, then just publish the waypoints, else decelerate the waypoints
 		lane = Lane()
 
-		closest_idx = self.get_closest_waypoint()
+		closest_idx = self.get_closest_waypoint(self.current_pose)
 		farthest_idx = closest_idx + LOOKAHEAD_WPS
 		base_waypoints =  self.base_lane.waypoints[closest_idx:farthest_idx]
 
-		if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx);
+		if self.stopline_wp_idx == -1 or (self.stopline_wp_idx >= farthest_idx):
 			lane.waypoints = base_waypoints
 		else:
-			lane_waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
+			lane.waypoints = self.decelerate_waypoints(base_waypoints, closest_idx)
 
 		return lane
 
 	def decelerate_waypoints(self, waypoints, closest_idx):
 		temp = []
-		for i, wp in enumerate(waypoints);
+		for i, wp in enumerate(waypoints):
 			p = Waypoint()
 			p.pose = wp.pose
 			# stop two waypoints back from the line so that the car stops on time
@@ -169,8 +170,8 @@ class WaypointUpdater(object):
 		# rospy.loginfo('in create final waypoints')
 		if self.current_pose is not None:
 			idx_of_nearest_wp = self.get_closest_waypoint (self.current_pose)
-			rospy.loginfo('nearest waypoint:')
-			rospy.loginfo(idx_of_nearest_wp)
+			# rospy.loginfo('nearest waypoint:')
+			# rospy.loginfo(idx_of_nearest_wp)
 			next_waypoints = copy.deepcopy(self.waypoints[idx_of_nearest_wp:idx_of_nearest_wp+LOOKAHEAD_WPS])
 			lane = Lane()
 			lane.header.frame_id = '/world'

@@ -193,8 +193,8 @@ class TLDetector(object):
 
 			for i, light in enumerate(self.lights):
 				line = stop_line_positions[i]
-				rospy.loginfo("line values:")
-				rospy.loginfo(line)
+				# rospy.loginfo("line values:")
+				# rospy.loginfo(line)
 				temp_wp_idx = self.get_closest_waypoint(line[0], line[1])
 				# find closest waypoint index
 				d = temp_wp_idx - car_wp_idx
@@ -206,9 +206,9 @@ class TLDetector(object):
 		#TODO find the closest visible traffic light (if one exists)
 		if closest_light:
 			state = self.get_light_state(closest_light)
-			rospy.loginfo("tl_detector returning values:")
-			rospy.loginfo(line_wp_idx)
-			rospy.loginfo(state)
+			# rospy.loginfo("tl_detector returning values:")
+			# rospy.loginfo(line_wp_idx)
+			# rospy.loginfo(state)
 			return line_wp_idx, state       
 		
 		return -1, TrafficLight.UNKNOWN
