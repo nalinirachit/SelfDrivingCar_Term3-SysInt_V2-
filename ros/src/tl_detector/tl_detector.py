@@ -17,7 +17,18 @@ import yaml
 import math
 
 
-# Nalini 11/3/2018
+'''
+Nalini 1/6/2019
+appears to return 0 but still does not work
+int: ID of traffic light color (specified in styx_msgs/TrafficLight)
+
+uint8 UNKNOWN=4
+uint8 GREEN=2
+uint8 YELLOW=1
+uint8 RED=0
+/home/student/CarND-Capstone-master/ros/src/styx_msgs/msg
+
+'''
 
 STATE_COUNT_THRESHOLD = 3
 
@@ -155,6 +166,8 @@ class TLDetector(object):
 		"""
 
 		# for testing just return light stats
+		rospy.loginfo("Light State")
+		rospy.loginfo(light.state)
 		return light.state
 
 		# 9/8/2018 comment out for now
@@ -206,9 +219,9 @@ class TLDetector(object):
 		#TODO find the closest visible traffic light (if one exists)
 		if closest_light:
 			state = self.get_light_state(closest_light)
-			# rospy.loginfo("tl_detector returning values:")
-			# rospy.loginfo(line_wp_idx)
-			# rospy.loginfo(state)
+			rospy.loginfo("tl_detector returning values:")
+			rospy.loginfo(line_wp_idx)
+			rospy.loginfo(state)
 			return line_wp_idx, state       
 		
 		return -1, TrafficLight.UNKNOWN
