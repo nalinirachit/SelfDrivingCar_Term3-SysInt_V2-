@@ -25,7 +25,8 @@ current status in `/vehicle/traffic_lights` message. You can use this message to
 as well as to verify your TL classifier.
 
 TODO (for Yousuf and Aaron): Stopline location for each traffic light.
-Nalini 11/25/2018
+Nalini 1/21/2019
+Check loop code, not going beyond first line
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
@@ -67,7 +68,21 @@ class WaypointUpdater(object):
 		self.current_pose = None
 		
 
-		rospy.spin()
+
+		self.loop()
+
+	
+	# new added 1/21
+	def loop(self):
+		rospy.loginfo("In waypoint updater loop")
+		rate =  rospy.Rate(50)
+		while not rospy.is_shutdown:
+			rospy.loginfo("inside shutdown")
+			if self.pose and self.base_lane:
+				rospy.loginfo("calling publish_waypoints")
+				self.publish_waypoints
+			rate.sleep()
+
 
 
 	def pose_cb(self, msg):
@@ -75,9 +90,11 @@ class WaypointUpdater(object):
 		# added 7/1/2018
 		# get pose of the car
 		self.current_pose = msg.pose
+		self.pose = msg
 		# rospy.loginfo('4a. in Pose cb')
-		if self.waypoints is not None:
-			self.create_final_waypoints()
+		# Comment out 1/21 to call publish waypoints
+		# if self.waypoints is not None:
+			# self.create_final_waypoints()
 
 		# rospy.loginfo('4. After pose_cb')
 		# rospy.loginfo(self.current_pose)
@@ -97,10 +114,10 @@ class WaypointUpdater(object):
 
 	def traffic_cb(self, msg):
 		# TODO: Callback for /traffic_waypoint message. Implement
-		# rospy.loginfo("in traffic_cb waypoint updater:")
+		rospy.loginfo("in traffic_cb waypoint updater:")
 		
 		self.stopline_wp_idx = msg.data
-		# rospy.loginfo(msg.data)
+		rospy.loginfo(msg.data)
 		
 
 	def obstacle_cb(self, msg):
